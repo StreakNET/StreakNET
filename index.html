@@ -1,0 +1,1140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StreakNet — SFOTH IV Anti-Cheat</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --black:   #080808;
+    --dark:    #0e0e0e;
+    --panel:   #131313;
+    --border:  #1e1e1e;
+    --muted:   #2e2e2e;
+    --silver:  #7a7a7a;
+    --light:   #c0c0c0;
+    --white:   #efefef;
+    --accent:  #e0e0e0;
+    --slash:   #555555;
+    --danger:  #cc3333;
+    --glow:    rgba(255,255,255,0.06);
+    --glow-strong: rgba(255,255,255,0.12);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--black);
+    color: var(--light);
+    font-family: 'Inter', sans-serif;
+    font-weight: 300;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* ── SCAN LINE OVERLAY ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,0.035) 2px,
+      rgba(0,0,0,0.035) 4px
+    );
+    pointer-events: none;
+    z-index: 999;
+  }
+
+  /* ── GRID BACKGROUND ── */
+  .grid-bg {
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+    z-index: 0;
+    mask-image: radial-gradient(ellipse 80% 80% at 50% 40%, black 30%, transparent 100%);
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 44px;
+    height: 62px;
+    background: rgba(8,8,8,0.88);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .nav-brand {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 1.1rem;
+    letter-spacing: 0.22em;
+    color: var(--white);
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .nav-brand-slash {
+    display: inline-block;
+    width: 1px;
+    height: 14px;
+    background: var(--muted);
+    transform: rotate(20deg);
+  }
+
+  .nav-brand span { color: var(--silver); }
+
+  .nav-links {
+    display: flex;
+    gap: 36px;
+    list-style: none;
+  }
+
+  .nav-links a {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 500;
+    font-size: 0.8rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--slash);
+    text-decoration: none;
+    transition: color 0.2s;
+    position: relative;
+  }
+
+  .nav-links a::after {
+    content: '';
+    position: absolute;
+    bottom: -3px; left: 0; right: 0;
+    height: 1px;
+    background: var(--white);
+    transform: scaleX(0);
+    transition: transform 0.2s;
+  }
+
+  .nav-links a:hover { color: var(--white); }
+  .nav-links a:hover::after { transform: scaleX(1); }
+
+  .nav-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.72rem;
+    color: #4a9a4a;
+    background: rgba(74,154,74,0.08);
+    border: 1px solid rgba(74,154,74,0.2);
+    padding: 5px 12px;
+  }
+
+  .status-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: #4a9a4a;
+    box-shadow: 0 0 6px #4a9a4a;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; box-shadow: 0 0 6px #4a9a4a; }
+    50%       { opacity: 0.4; box-shadow: 0 0 2px #4a9a4a; }
+  }
+
+  /* ── HERO ── */
+  .hero {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    overflow: hidden;
+    padding-top: 62px;
+    z-index: 1;
+  }
+
+  /* radial glow under banner */
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 50%;
+    transform: translateX(-50%);
+    width: 700px;
+    height: 300px;
+    background: radial-gradient(ellipse at 50% 100%, rgba(255,255,255,0.045) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .hero-eyebrow {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.3em;
+    color: var(--slash);
+    text-transform: uppercase;
+    margin-bottom: 28px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    animation: fadeUp 0.6s ease both;
+  }
+
+  .hero-eyebrow::before,
+  .hero-eyebrow::after {
+    content: '';
+    display: block;
+    width: 40px;
+    height: 1px;
+    background: var(--muted);
+  }
+
+  .hero-banner {
+    width: 100%;
+    max-width: 860px;
+    opacity: 0.97;
+    filter: contrast(1.06) brightness(1.02);
+    animation: fadeUp 0.7s 0.1s ease both;
+    position: relative;
+    z-index: 1;
+  }
+
+  .hero-sub {
+    margin-top: 28px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.76rem;
+    letter-spacing: 0.24em;
+    color: var(--slash);
+    text-transform: uppercase;
+    animation: fadeUp 0.7s 0.2s ease both;
+  }
+
+  .hero-cta-row {
+    margin-top: 36px;
+    display: flex;
+    gap: 14px;
+    justify-content: center;
+    flex-wrap: wrap;
+    animation: fadeUp 0.7s 0.3s ease both;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .btn-primary {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.85rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--black);
+    background: var(--white);
+    border: none;
+    padding: 14px 34px;
+    cursor: pointer;
+    text-decoration: none;
+    clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+    transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+    box-shadow: 0 0 0 rgba(255,255,255,0);
+  }
+
+  .btn-primary:hover {
+    background: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 28px rgba(255,255,255,0.15);
+  }
+
+  .btn-outline {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 600;
+    font-size: 0.85rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--silver);
+    background: transparent;
+    border: 1px solid var(--muted);
+    padding: 14px 34px;
+    cursor: pointer;
+    text-decoration: none;
+    clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+    transition: border-color 0.2s, color 0.2s, background 0.2s;
+  }
+
+  .btn-outline:hover {
+    border-color: var(--silver);
+    color: var(--white);
+    background: rgba(255,255,255,0.04);
+  }
+
+  /* ── TICKER ── */
+  .ticker {
+    background: var(--panel);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    overflow: hidden;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    position: relative;
+    z-index: 1;
+  }
+
+  .ticker::before, .ticker::after {
+    content: '';
+    position: absolute;
+    top: 0; bottom: 0;
+    width: 80px;
+    z-index: 2;
+    pointer-events: none;
+  }
+  .ticker::before { left: 0; background: linear-gradient(to right, var(--panel), transparent); }
+  .ticker::after  { right: 0; background: linear-gradient(to left, var(--panel), transparent); }
+
+  .ticker-inner {
+    display: flex;
+    gap: 60px;
+    white-space: nowrap;
+    animation: ticker 30s linear infinite;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--slash);
+    letter-spacing: 0.14em;
+  }
+
+  .ticker-inner span { color: #4a9a4a; }
+
+  @keyframes ticker {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+
+  /* ── SECTION COMMON ── */
+  section {
+    padding: 96px 44px;
+    max-width: 1120px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+  }
+
+  .section-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.26em;
+    color: var(--slash);
+    text-transform: uppercase;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .section-label::after {
+    content: '';
+    display: block;
+    flex: 1;
+    max-width: 60px;
+    height: 1px;
+    background: var(--muted);
+  }
+
+  .section-title {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: clamp(2rem, 4.5vw, 3rem);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--white);
+    line-height: 1.08;
+    margin-bottom: 20px;
+  }
+
+  .section-title em {
+    font-style: normal;
+    color: var(--silver);
+  }
+
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 0 44px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ── FEATURES GRID ── */
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    margin-top: 52px;
+  }
+
+  .feature-card {
+    background: var(--dark);
+    padding: 38px 34px;
+    position: relative;
+    transition: background 0.25s;
+    overflow: hidden;
+  }
+
+  .feature-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 2px;
+    height: 100%;
+    background: linear-gradient(to bottom, var(--white), transparent 60%);
+    opacity: 0;
+    transition: opacity 0.25s;
+  }
+
+  /* corner accent */
+  .feature-card::after {
+    content: '';
+    position: absolute;
+    top: 0; right: 0;
+    width: 40px; height: 40px;
+    background: linear-gradient(225deg, rgba(255,255,255,0.05) 0%, transparent 60%);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .feature-card:hover { background: #131313; }
+  .feature-card:hover::before { opacity: 0.5; }
+  .feature-card:hover::after { opacity: 1; }
+
+  .feature-icon {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+    filter: grayscale(1) brightness(1.5);
+    display: inline-block;
+    transition: transform 0.2s;
+  }
+
+  .feature-card:hover .feature-icon { transform: scale(1.12); }
+
+  .feature-name {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--white);
+    margin-bottom: 10px;
+  }
+
+  .feature-desc {
+    font-size: 0.84rem;
+    color: var(--silver);
+    line-height: 1.75;
+  }
+
+  /* ── HOW IT WORKS ── */
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 0;
+    margin-top: 56px;
+    border: 1px solid var(--border);
+  }
+
+  .step {
+    position: relative;
+    padding: 36px 30px;
+    border-right: 1px solid var(--border);
+    transition: background 0.25s;
+  }
+
+  .step:last-child { border-right: none; }
+  .step:hover { background: rgba(255,255,255,0.02); }
+
+  .step-num {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--slash);
+    letter-spacing: 0.14em;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .step-num::after {
+    content: '';
+    display: block;
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .step-title {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 1.05rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--white);
+    margin-bottom: 12px;
+  }
+
+  .step-body {
+    font-size: 0.83rem;
+    color: var(--silver);
+    line-height: 1.78;
+  }
+
+  /* step counter big faded number */
+  .step-bg-num {
+    position: absolute;
+    bottom: 10px; right: 16px;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 5rem;
+    color: rgba(255,255,255,0.03);
+    line-height: 1;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  /* ── STATS BAR ── */
+  .stats-bar {
+    background: var(--panel);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    position: relative;
+    z-index: 1;
+  }
+
+  .stats-inner {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 0 44px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .stat {
+    padding: 52px 0;
+    text-align: center;
+    border-right: 1px solid var(--border);
+    position: relative;
+    transition: background 0.25s;
+  }
+
+  .stat:hover { background: rgba(255,255,255,0.02); }
+  .stat:last-child { border-right: none; }
+
+  .stat-num {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 2.6rem;
+    letter-spacing: 0.04em;
+    color: var(--white);
+    line-height: 1;
+    text-shadow: 0 0 40px rgba(255,255,255,0.1);
+  }
+
+  .stat-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.67rem;
+    letter-spacing: 0.2em;
+    color: var(--slash);
+    text-transform: uppercase;
+    margin-top: 10px;
+  }
+
+  /* animated underline on stat hover */
+  .stat::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 50%;
+    transform: translateX(-50%) scaleX(0);
+    width: 40px;
+    height: 1px;
+    background: var(--white);
+    transition: transform 0.3s;
+  }
+
+  .stat:hover::after { transform: translateX(-50%) scaleX(1); }
+
+  /* ── TERMINAL BOX ── */
+  .terminal {
+    background: #0a0a0a;
+    border: 1px solid var(--muted);
+    padding: 30px 34px;
+    margin-top: 52px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.81rem;
+    line-height: 2.1;
+    color: #666;
+    position: relative;
+  }
+
+  /* corner cuts */
+  .terminal::before {
+    content: 'SYSTEM LOG';
+    position: absolute;
+    top: -1px; left: 24px;
+    transform: translateY(-50%);
+    background: #0a0a0a;
+    padding: 0 10px;
+    font-size: 0.63rem;
+    letter-spacing: 0.24em;
+    color: var(--slash);
+    border: 1px solid var(--muted);
+  }
+
+  /* blinking cursor on last line */
+  .terminal-cursor {
+    display: inline-block;
+    width: 7px;
+    height: 0.9em;
+    background: #4a9a4a;
+    vertical-align: middle;
+    margin-left: 4px;
+    animation: blink 1.1s step-end infinite;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0; }
+  }
+
+  .terminal .ok   { color: #4a9a4a; }
+  .terminal .warn { color: #c89a1a; }
+  .terminal .info { color: #5a8ab0; }
+  .terminal .dim  { color: #383838; }
+
+  /* ── REPORT FORM ── */
+  .report-form {
+    margin-top: 52px;
+    border: 1px solid var(--border);
+    background: var(--dark);
+    padding: 44px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 28px;
+    align-items: end;
+  }
+
+  .report-form .hp-field {
+    position: absolute;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+  }
+
+  .form-row {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .form-row label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--slash);
+  }
+
+  .form-row input {
+    background: var(--panel);
+    border: 1px solid var(--muted);
+    color: var(--white);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.88rem;
+    padding: 12px 14px;
+    outline: none;
+    transition: border-color 0.2s, background 0.2s;
+  }
+
+  .form-row input::placeholder { color: #4a4a4a; }
+
+  .form-row input:focus {
+    border-color: var(--silver);
+    background: #161616;
+  }
+
+  .form-row input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(0.6);
+    cursor: pointer;
+  }
+
+  .report-form .btn-primary {
+    grid-column: 1 / -1;
+    justify-self: start;
+  }
+
+  .report-note {
+    margin-top: 16px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    color: var(--slash);
+  }
+
+  .report-form-success {
+    grid-column: 1 / -1;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.78rem;
+    letter-spacing: 0.06em;
+    color: #4a9a4a;
+    display: none;
+  }
+
+  .report-form-error {
+    grid-column: 1 / -1;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.78rem;
+    letter-spacing: 0.06em;
+    color: var(--danger);
+    display: none;
+  }
+
+  @media (max-width: 720px) {
+    .report-form { grid-template-columns: 1fr; padding: 28px; }
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    background: var(--dark);
+    border-top: 1px solid var(--border);
+    padding: 56px 44px;
+    text-align: center;
+    position: relative;
+    z-index: 1;
+  }
+
+  .footer-brand {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 1.3rem;
+    letter-spacing: 0.24em;
+    color: var(--white);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  .footer-tagline {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    color: var(--slash);
+    text-transform: uppercase;
+  }
+
+  .footer-links {
+    display: flex;
+    justify-content: center;
+    gap: 36px;
+    margin-top: 30px;
+    list-style: none;
+  }
+
+  .footer-links a {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.8rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--slash);
+    text-decoration: none;
+    transition: color 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .footer-links a::before {
+    content: '→';
+    opacity: 0;
+    transform: translateX(-4px);
+    transition: opacity 0.2s, transform 0.2s;
+  }
+
+  .footer-links a:hover { color: var(--silver); }
+  .footer-links a:hover::before { opacity: 1; transform: translateX(0); }
+
+  .footer-copy {
+    margin-top: 32px;
+    font-size: 0.73rem;
+    color: #2e2e2e;
+    letter-spacing: 0.08em;
+  }
+
+  /* ── SCROLL REVEAL ── */
+  .reveal {
+    opacity: 0;
+    transform: translateY(22px);
+    transition: opacity 0.55s ease, transform 0.55s ease;
+  }
+
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* stagger children */
+  .reveal-grid > * {
+    opacity: 0;
+    transform: translateY(18px);
+    transition: opacity 0.45s ease, transform 0.45s ease;
+  }
+
+  .reveal-grid.visible > *:nth-child(1) { opacity:1; transform:none; transition-delay:0.05s; }
+  .reveal-grid.visible > *:nth-child(2) { opacity:1; transform:none; transition-delay:0.12s; }
+  .reveal-grid.visible > *:nth-child(3) { opacity:1; transform:none; transition-delay:0.19s; }
+  .reveal-grid.visible > *:nth-child(4) { opacity:1; transform:none; transition-delay:0.26s; }
+  .reveal-grid.visible > *:nth-child(5) { opacity:1; transform:none; transition-delay:0.33s; }
+  .reveal-grid.visible > *:nth-child(6) { opacity:1; transform:none; transition-delay:0.40s; }
+
+  /* ── REDUCED MOTION ── */
+  @media (prefers-reduced-motion: reduce) {
+    .reveal, .reveal-grid > * { opacity: 1; transform: none; transition: none; }
+    .ticker-inner { animation: none; }
+    .hero-eyebrow, .hero-banner, .hero-sub, .hero-cta-row { animation: none; opacity: 1; }
+  }
+
+  /* ── MOBILE ── */
+  @media (max-width: 720px) {
+    nav { padding: 0 20px; }
+    .nav-links { display: none; }
+    section { padding: 64px 20px; }
+    .divider { margin: 0 20px; }
+    .stats-inner { grid-template-columns: repeat(2, 1fr); padding: 0 20px; }
+    .stat { border-bottom: 1px solid var(--border); }
+    .steps { display: block; }
+    .step { border-right: none; border-bottom: 1px solid var(--border); }
+    .step:last-child { border-bottom: none; }
+    footer { padding: 44px 20px; }
+    .footer-links { flex-direction: column; align-items: center; gap: 18px; }
+    .grid-bg { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="grid-bg"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-brand">Streak<span>Net</span><div class="nav-brand-slash"></div></div>
+  <ul class="nav-links">
+    <li><a href="#features">Features</a></li>
+    <li><a href="#how">How It Works</a></li>
+    <li><a href="#stats">Stats</a></li>
+    <li><a href="#report">Report</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <div class="nav-status">
+    <div class="status-dot"></div>
+    BOTS INACTIVE
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-eyebrow">SFOTH IV &nbsp;·&nbsp; Anti-Cheat Infrastructure</div>
+  <img class="hero-banner" src="streaknet-banner.png" alt="StreakNet SFOTH IV">
+  <p class="hero-sub">Mobile-First Anti-Cheat &nbsp;/&nbsp; Real-Time Enforcement &nbsp;/&nbsp; SFOTH IV</p>
+  <div class="hero-cta-row">
+    <a href="#how" class="btn-primary">How It Works</a>
+    <a href="#features" class="btn-outline">View Features</a>
+  </div>
+</div>
+
+<!-- TICKER -->
+<div class="ticker">
+  <div class="ticker-inner">
+    <span>●</span> ANTI-REACH ACTIVE &nbsp;&nbsp;
+    <span>●</span> LOOPKILL DETECTION RUNNING &nbsp;&nbsp;
+    <span>●</span> DETECTION SUCCESSFUL &nbsp;&nbsp;
+    <span>●</span> SFOTH IV ONLINE &nbsp;&nbsp;
+    <span>●</span> PHONE BOT MONITORING &nbsp;&nbsp;
+    <span>●</span> 99.7% DETECTION RATE &nbsp;&nbsp;
+    <span>●</span> ANTI-GRIEFER ACTIVE &nbsp;&nbsp;
+    <span>●</span> EXPLOIT DETECTION RUNNING &nbsp;&nbsp;
+    <span>●</span> TEMPERATURES STABLE &nbsp;&nbsp;
+    <span>●</span> SFOTH IV BACK FROM THE DEAD &nbsp;&nbsp;
+    <span>●</span> PHONES DEPLOYED &nbsp;&nbsp;
+    <span>●</span> 99.9% DETECTION RATE &nbsp;&nbsp;
+  </div>
+</div>
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="section-label reveal">// CAPABILITIES</div>
+  <h2 class="section-title reveal">Built to Catch <em>Every Exploit</em></h2>
+  <p class="reveal" style="color:var(--silver); max-width:500px; font-size:0.88rem;">
+    StreakNet's anticheat bots run natively on mobile hardware; making maintenance easy.
+  </p>
+
+  <div class="features-grid reveal-grid">
+    <div class="feature-card">
+      <div class="feature-icon">\🛡️/</div>
+      <div class="feature-name">Real-Time Exploit Detection</div>
+      <p class="feature-desc">Flags suspicious reach coming from a player, logs and puts the player into a kick queue.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">\📱/</div>
+      <div class="feature-name">Phone-Native Bot Network</div>
+      <p class="feature-desc">Anticheat bots operate on dedicated mobile devices, making server-wide monitoring possible.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">\🚫/</div>
+      <div class="feature-name">Anti-Looper System</div>
+      <p class="feature-desc">Detects "Loopkilling" or sword reach with impressive physics simulation.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">\📋/</div>
+      <div class="feature-name">Automated Evidence Logging</div>
+      <p class="feature-desc">Every flag is timestamped and stored with player details; making appeals straightforward.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">\⚡/</div>
+      <div class="feature-name">Instant Action Enforcement</div>
+      <p class="feature-desc">GUARDIAN issues kicks on offenders that loopkill.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">\🔍/</div>
+      <div class="feature-name">Behavioral Analysis</div>
+      <p class="feature-desc">Account matching across servers is crucial to keep repeat offenders away!</p>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- STATS BAR -->
+<div class="stats-bar" id="stats">
+  <div class="stats-inner reveal-grid">
+    <div class="stat">
+      <div class="stat-num">99.7%</div>
+      <div class="stat-label">Detection Rate</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">&lt;200ms</div>
+      <div class="stat-label">Avg Response Time</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">24/7</div>
+      <div class="stat-label">Bot Uptime</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">0</div>
+      <div class="stat-label">False Bans This Month (trust)</div>
+    </div>
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<section id="how">
+  <div class="section-label reveal">// PROCESS</div>
+  <h2 class="section-title reveal">How <em>StreakNet</em> Works</h2>
+
+  <div class="steps reveal-grid">
+    <div class="step">
+      <div class="step-num">STEP 01</div>
+      <div class="step-title">Deploy Bots into servers</div>
+      <p class="step-body">A dedicated mobile device runs the flagship GUARDIAN model in SFOTHIV.</p>
+      <div class="step-bg-num">01</div>
+    </div>
+    <div class="step">
+      <div class="step-num">STEP 02</div>
+      <div class="step-title">Monitor Sessions Live</div>
+      <p class="step-body">Bots join sessions as an observer, collecting distance data, interaction timestamps, and reach signals in real time.</p>
+      <div class="step-bg-num">02</div>
+    </div>
+    <div class="step">
+      <div class="step-num">STEP 03</div>
+      <div class="step-title">Flag & Classify</div>
+      <p class="step-body">Suspicious behavior is scored against known exploit signatures. Reach flags trigger automatic action; edge cases go to appeal review.</p>
+      <div class="step-bg-num">03</div>
+    </div>
+    <div class="step">
+      <div class="step-num">STEP 04</div>
+      <div class="step-title">Log & Notify</div>
+      <p class="step-body">Kicks are issued on flagged players which are sent to our discord server.</p>
+      <div class="step-bg-num">04</div>
+    </div>
+  </div>
+
+  <!-- TERMINAL -->
+  <div class="terminal reveal">
+    <div><span class="dim">[2026-06-15 14:32:01]</span> <span class="ok">INIT</span>   StreakNet bot v3.2.1 starting on device Iphone-8 [global]</div>
+    <div><span class="dim">[2026-06-15 14:32:03]</span> <span class="ok">OK</span>     Session attached -- SFOTHIV</div>
+    <div><span class="dim">[2026-06-15 14:32:47]</span> <span class="info">SCAN</span>   Monitoring 18 active players</div>
+    <div><span class="dim">[2026-06-15 14:33:12]</span> <span class="warn">FLAG</span>   Player "Vessel111117" -- flagged for reach!</div>
+    <div><span class="dim">[2026-06-15 14:33:12]</span> <span class="ok">ACT</span>    Auto-kick issued and data has been logged.</div>
+    <div><span class="dim">[2026-06-15 14:33:45]</span> <span class="ok">OK</span>     Session clean. Continuing observation...<span class="terminal-cursor"></span></div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- REPORT -->
+<section id="report">
+  <div class="section-label reveal">// SUBMIT</div>
+  <h2 class="section-title reveal">Report a <em>Player</em></h2>
+  <p class="reveal" style="color:var(--silver); max-width:500px; font-size:0.88rem;">
+    Spotted a cheater? Submit the details below and our team will review the case.
+  </p>
+
+  <form class="report-form reveal" id="report-form">
+    <div class="form-row">
+      <label for="rbx-username">Roblox Username</label>
+      <input type="text" id="rbx-username" name="rbx-username" placeholder="e.g. Builderman" required>
+    </div>
+    <div class="form-row">
+      <label for="rbx-userid">Roblox UserID</label>
+      <input type="text" id="rbx-userid" name="rbx-userid" placeholder="e.g. 156" inputmode="numeric" required>
+    </div>
+    <div class="form-row">
+      <label for="date-reported">Date Reported</label>
+      <input type="date" id="date-reported" name="date-reported" required>
+    </div>
+
+    <!-- Honeypot: hidden from real people, bots tend to fill every field they see -->
+    <div class="form-row hp-field" aria-hidden="true">
+      <label for="hp-website">Website</label>
+      <input type="text" id="hp-website" name="hp-website" tabindex="-1" autocomplete="off">
+    </div>
+
+    <button type="submit" class="btn-primary" id="report-submit-btn">Submit Report</button>
+    <div class="report-form-success" id="report-success">// REPORT LOGGED — Our team will review your report.</div>
+    <div class="report-form-error" id="report-error"></div>
+  </form>
+  <p class="report-note">Anyone can submit a report. For urgent cases, use the Discord link below.</p>
+</section>
+
+<hr class="divider">
+
+<!-- FOOTER -->
+<footer id="contact">
+  <div class="footer-brand">StreakNet</div>
+  <div class="footer-tagline">SFOTH IV &nbsp;·&nbsp; Anti-Griefer &nbsp;·&nbsp; Anti-Exploit &nbsp;·&nbsp; Fair Play</div>
+  <ul class="footer-links">
+  <li><a href="https://discord.gg/QHJWDueJsr">Discord</a></li>
+  <li><a href="https://discord.gg/QHJWDueJsr">Report a Player</a></li>
+  <li><a href="https://discord.gg/QHJWDueJsr">Appeal a Ban</a></li>
+</ul>
+  <p class="footer-copy">© 2026 StreakNet. All rights reserved. Built for fair play.</p>
+</footer>
+
+<script>
+  // Scroll reveal
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.12 });
+
+  document.querySelectorAll('.reveal, .reveal-grid').forEach(el => observer.observe(el));
+
+  // Report form
+  const REPORT_ENDPOINT = "https://script.google.com/macros/s/AKfycbwFzovIVL0Y3ovVWObHAqVMK9aEYWhZkfWYEOnvox-zVI-2kE9A2K-5LL0c77pYsTOLnA/exec";
+
+  const dateInput = document.getElementById('date-reported');
+  if (dateInput) dateInput.valueAsDate = new Date();
+
+  // Records when the form became visible, used as a lightweight bot check
+  // (real humans rarely fill out and submit a form in under ~1.5 seconds).
+  const formRenderedAt = Date.now();
+
+  const reportForm = document.getElementById('report-form');
+  const submitBtn = document.getElementById('report-submit-btn');
+  const successEl = document.getElementById('report-success');
+  const errorEl = document.getElementById('report-error');
+
+  const ERROR_MESSAGES = {
+    rate_limited: 'Please wait a few seconds before submitting again.',
+    missing_fields: 'Please fill in every field.',
+    invalid_user_id: 'Roblox UserID must be numbers only.',
+    invalid_date: 'Date Reported looks invalid.',
+    sheet_not_found: 'Server misconfigured — contact the site owner.',
+    server_error: 'Something went wrong. Try again shortly.',
+    network_error: 'Could not reach the report server. Check your connection.',
+    not_configured: 'Report endpoint is not configured yet.'
+  };
+
+  function showError(key) {
+    errorEl.textContent = '// ' + (ERROR_MESSAGES[key] || ERROR_MESSAGES.server_error).toUpperCase();
+    errorEl.style.display = 'block';
+    successEl.style.display = 'none';
+  }
+
+  if (reportForm) {
+    reportForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      errorEl.style.display = 'none';
+      successEl.style.display = 'none';
+
+      if (!REPORT_ENDPOINT || REPORT_ENDPOINT.indexOf('PASTE_YOUR') === 0) {
+        showError('not_configured');
+        return;
+      }
+
+      const payload = {
+        username: document.getElementById('rbx-username').value.trim(),
+        userId: document.getElementById('rbx-userid').value.trim(),
+        dateReported: document.getElementById('date-reported').value,
+        hp: document.getElementById('hp-website').value, // honeypot, should stay empty
+        elapsedMs: Date.now() - formRenderedAt
+      };
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Submitting...';
+
+      try {
+        // Sent as a plain-text body on purpose: this avoids a CORS preflight
+        // request, which Apps Script web apps don't handle.
+        const res = await fetch(REPORT_ENDPOINT, {
+          method: 'POST',
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+
+        if (data.ok) {
+          successEl.style.display = 'block';
+          reportForm.reset();
+          dateInput.valueAsDate = new Date();
+        } else {
+          showError(data.error);
+        }
+      } catch (err) {
+        showError('network_error');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Submit Report';
+      }
+    });
+  }
+</script>
+
+</body>
+</html>
