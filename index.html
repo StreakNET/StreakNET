@@ -317,7 +317,6 @@
 
   .ticker-inner {
     display: flex;
-    gap: 60px;
     white-space: nowrap;
     animation: ticker 30s linear infinite;
     font-family: 'Share Tech Mono', monospace;
@@ -326,7 +325,14 @@
     letter-spacing: 0.14em;
   }
 
-  .ticker-inner span { color: #4a9a4a; }
+  .ticker-set {
+    display: flex;
+    flex-shrink: 0;
+    gap: 60px;
+    padding-right: 60px;
+  }
+
+  .ticker-inner span:not(.ticker-set) { color: #4a9a4a; }
 
   @keyframes ticker {
     from { transform: translateX(0); }
@@ -961,18 +967,34 @@
 <!-- TICKER -->
 <div class="ticker">
   <div class="ticker-inner">
-    <span>●</span> ANTI-REACH ACTIVE &nbsp;&nbsp;
-    <span>●</span> LOOPKILL DETECTION RUNNING &nbsp;&nbsp;
-    <span>●</span> DETECTION SUCCESSFUL &nbsp;&nbsp;
-    <span>●</span> SFOTH IV ONLINE &nbsp;&nbsp;
-    <span>●</span> PHONE BOT MONITORING &nbsp;&nbsp;
-    <span>●</span> 99.7% DETECTION RATE &nbsp;&nbsp;
-    <span>●</span> ANTI-GRIEFER ACTIVE &nbsp;&nbsp;
-    <span>●</span> EXPLOIT DETECTION RUNNING &nbsp;&nbsp;
-    <span>●</span> TEMPERATURES STABLE &nbsp;&nbsp;
-    <span>●</span> SFOTH IV BACK FROM THE DEAD &nbsp;&nbsp;
-    <span>●</span> PHONES DEPLOYED &nbsp;&nbsp;
-    <span>●</span> 99.9% DETECTION RATE &nbsp;&nbsp;
+    <span class="ticker-set">
+      <span>●</span> ANTI-REACH ACTIVE &nbsp;&nbsp;
+      <span>●</span> LOOPKILL DETECTION RUNNING &nbsp;&nbsp;
+      <span>●</span> DETECTION SUCCESSFUL &nbsp;&nbsp;
+      <span>●</span> SFOTH IV ONLINE &nbsp;&nbsp;
+      <span>●</span> PHONE BOT MONITORING &nbsp;&nbsp;
+      <span>●</span> 99.7% DETECTION RATE &nbsp;&nbsp;
+      <span>●</span> ANTI-GRIEFER ACTIVE &nbsp;&nbsp;
+      <span>●</span> EXPLOIT DETECTION RUNNING &nbsp;&nbsp;
+      <span>●</span> TEMPERATURES STABLE &nbsp;&nbsp;
+      <span>●</span> SFOTH IV BACK FROM THE DEAD &nbsp;&nbsp;
+      <span>●</span> PHONES DEPLOYED &nbsp;&nbsp;
+      <span>●</span> 99.9% DETECTION RATE &nbsp;&nbsp;
+    </span>
+    <span class="ticker-set">
+      <span>●</span> ANTI-REACH ACTIVE &nbsp;&nbsp;
+      <span>●</span> LOOPKILL DETECTION RUNNING &nbsp;&nbsp;
+      <span>●</span> DETECTION SUCCESSFUL &nbsp;&nbsp;
+      <span>●</span> SFOTH IV ONLINE &nbsp;&nbsp;
+      <span>●</span> PHONE BOT MONITORING &nbsp;&nbsp;
+      <span>●</span> 99.7% DETECTION RATE &nbsp;&nbsp;
+      <span>●</span> ANTI-GRIEFER ACTIVE &nbsp;&nbsp;
+      <span>●</span> EXPLOIT DETECTION RUNNING &nbsp;&nbsp;
+      <span>●</span> TEMPERATURES STABLE &nbsp;&nbsp;
+      <span>●</span> SFOTH IV BACK FROM THE DEAD &nbsp;&nbsp;
+      <span>●</span> PHONES DEPLOYED &nbsp;&nbsp;
+      <span>●</span> 99.9% DETECTION RATE &nbsp;&nbsp;
+    </span>
   </div>
 </div>
 
