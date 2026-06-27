@@ -793,6 +793,90 @@
     letter-spacing: 0.08em;
   }
 
+  /* ── FOUNDERS ── */
+  .footer-founders {
+    margin-top: 44px;
+    padding-top: 36px;
+    border-top: 1px solid var(--border);
+  }
+
+  .founders-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.3em;
+    color: var(--slash);
+    text-transform: uppercase;
+    margin-bottom: 18px;
+  }
+
+  .founders-row {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 14px;
+  }
+
+  .founder-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    padding: 9px 18px;
+    border: 1px solid var(--muted);
+    background: var(--panel);
+    text-decoration: none;
+    clip-path: polygon(6px 0%, 100% 0%, calc(100% - 6px) 100%, 0% 100%);
+    transition: border-color 0.2s, background 0.2s, transform 0.15s;
+  }
+
+  .founder-tag-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: #4a9a4a;
+    box-shadow: 0 0 6px #4a9a4a;
+    flex-shrink: 0;
+  }
+
+  .founder-tag-text {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 600;
+    font-size: 0.8rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--light);
+    transition: color 0.2s;
+  }
+
+  .founder-tag:hover {
+    border-color: var(--silver);
+    background: #181818;
+    transform: translateY(-2px);
+  }
+
+  .founder-tag:hover .founder-tag-text { color: var(--white); }
+
+  .footer-group-link {
+    margin-top: 22px;
+    display: flex;
+    justify-content: center;
+  }
+
+  .footer-group-link a {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--silver);
+    text-decoration: underline;
+    text-decoration-color: var(--muted);
+    text-underline-offset: 4px;
+    transition: color 0.2s, text-decoration-color 0.2s;
+  }
+
+  .footer-group-link a:hover {
+    color: var(--white);
+    text-decoration-color: var(--silver);
+  }
+
   /* ── SCROLL REVEAL ── */
   .reveal {
     opacity: 0;
@@ -1049,6 +1133,24 @@
   <li><a href="https://discord.gg/QHJWDueJsr">Report a Player</a></li>
   <li><a href="https://discord.gg/QHJWDueJsr">Appeal a Ban</a></li>
 </ul>
+
+  <div class="footer-founders">
+    <div class="founders-label">// Founders</div>
+    <div class="founders-row">
+      <a class="founder-tag" href="https://www.roblox.com/users/763420635/profile" target="_blank" rel="noopener">
+        <span class="founder-tag-dot"></span>
+        <span class="founder-tag-text">supertornado134</span>
+      </a>
+      <a class="founder-tag" href="https://www.roblox.com/users/1692503047/profile" target="_blank" rel="noopener">
+        <span class="founder-tag-dot"></span>
+        <span class="founder-tag-text">DevVerizion</span>
+      </a>
+    </div>
+    <div class="footer-group-link">
+      <a href="https://www.roblox.com/communities/1014010089/StreakNet#!/about" target="_blank" rel="noopener">View StreakNet Group →</a>
+    </div>
+  </div>
+
   <p class="footer-copy">© 2026 StreakNet. All rights reserved. Built for fair play.</p>
 </footer>
 
