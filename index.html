@@ -298,8 +298,6 @@
     border-bottom: 1px solid var(--border);
     overflow: hidden;
     height: 38px;
-    display: flex;
-    align-items: center;
     position: relative;
     z-index: 1;
   }
@@ -315,28 +313,47 @@
   .ticker::before { left: 0; background: linear-gradient(to right, var(--panel), transparent); }
   .ticker::after  { right: 0; background: linear-gradient(to left, var(--panel), transparent); }
 
-  .ticker-inner {
+  .ticker-track {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
     display: flex;
+    align-items: center;
     white-space: nowrap;
-    animation: ticker 30s linear infinite;
+    width: max-content;
+    will-change: transform;
+    animation-name: ticker-scroll;
+    animation-duration: 30s;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+  }
+
+  .ticker-group {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+  }
+
+  .ticker-item {
+    display: inline-flex;
+    align-items: center;
+    flex-shrink: 0;
+    padding: 0 30px;
     font-family: 'Share Tech Mono', monospace;
     font-size: 0.72rem;
-    color: var(--slash);
     letter-spacing: 0.14em;
+    color: var(--slash);
   }
 
-  .ticker-set {
-    display: flex;
-    flex-shrink: 0;
-    gap: 60px;
-    padding-right: 60px;
+  .ticker-dot {
+    color: #4a9a4a;
+    margin-right: 10px;
   }
 
-  .ticker-inner span:not(.ticker-set) { color: #4a9a4a; }
-
-  @keyframes ticker {
-    from { transform: translateX(0); }
-    to   { transform: translateX(-50%); }
+  @keyframes ticker-scroll {
+    0%   { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
   }
 
   /* ── SECTION COMMON ── */
@@ -912,7 +929,7 @@
   /* ── REDUCED MOTION ── */
   @media (prefers-reduced-motion: reduce) {
     .reveal, .reveal-grid > * { opacity: 1; transform: none; transition: none; }
-    .ticker-inner { animation: none; }
+    .ticker-track { animation: none; }
     .hero-eyebrow, .hero-banner, .hero-sub, .hero-cta-row { animation: none; opacity: 1; }
   }
 
@@ -966,35 +983,35 @@
 
 <!-- TICKER -->
 <div class="ticker">
-  <div class="ticker-inner">
-    <span class="ticker-set">
-      <span>●</span> ANTI-REACH ACTIVE &nbsp;&nbsp;
-      <span>●</span> LOOPKILL DETECTION RUNNING &nbsp;&nbsp;
-      <span>●</span> DETECTION SUCCESSFUL &nbsp;&nbsp;
-      <span>●</span> SFOTH IV ONLINE &nbsp;&nbsp;
-      <span>●</span> PHONE BOT MONITORING &nbsp;&nbsp;
-      <span>●</span> 99.7% DETECTION RATE &nbsp;&nbsp;
-      <span>●</span> ANTI-GRIEFER ACTIVE &nbsp;&nbsp;
-      <span>●</span> EXPLOIT DETECTION RUNNING &nbsp;&nbsp;
-      <span>●</span> TEMPERATURES STABLE &nbsp;&nbsp;
-      <span>●</span> SFOTH IV BACK FROM THE DEAD &nbsp;&nbsp;
-      <span>●</span> PHONES DEPLOYED &nbsp;&nbsp;
-      <span>●</span> 99.9% DETECTION RATE &nbsp;&nbsp;
-    </span>
-    <span class="ticker-set">
-      <span>●</span> ANTI-REACH ACTIVE &nbsp;&nbsp;
-      <span>●</span> LOOPKILL DETECTION RUNNING &nbsp;&nbsp;
-      <span>●</span> DETECTION SUCCESSFUL &nbsp;&nbsp;
-      <span>●</span> SFOTH IV ONLINE &nbsp;&nbsp;
-      <span>●</span> PHONE BOT MONITORING &nbsp;&nbsp;
-      <span>●</span> 99.7% DETECTION RATE &nbsp;&nbsp;
-      <span>●</span> ANTI-GRIEFER ACTIVE &nbsp;&nbsp;
-      <span>●</span> EXPLOIT DETECTION RUNNING &nbsp;&nbsp;
-      <span>●</span> TEMPERATURES STABLE &nbsp;&nbsp;
-      <span>●</span> SFOTH IV BACK FROM THE DEAD &nbsp;&nbsp;
-      <span>●</span> PHONES DEPLOYED &nbsp;&nbsp;
-      <span>●</span> 99.9% DETECTION RATE &nbsp;&nbsp;
-    </span>
+  <div class="ticker-track">
+    <div class="ticker-group">
+      <span class="ticker-item"><span class="ticker-dot">●</span>ANTI-REACH ACTIVE</span>
+      <span class="ticker-item"><span class="ticker-dot">●</span>LOOPKILL DETECTION RUNNING</span>
+      <span class="ticker-item"><span class="ticker-dot">●</span>DETECTION SUCCESSFUL</span>
+      <span class="ticker-item"><span class="ticker-dot">●</span>SFOTH IV ONLINE</span>
+      <span class="ticker-item"><span class="ticker-dot">●</span>PHONE BOT MONITORING</span>
+      <span class="ticker-item"><span class="ticker-dot">●</span>99.7% DETECTION RATE</span>
+      <span class="ticker-item"><span class="ticker-dot">●</span>ANTI-GRIEFER ACTIVE</span>
+      <span class="ticker-item"><span class="ticker-dot">●</span>EXPLOIT DETECTION RUNNING</span>
+      <span class="ticker-item"><span class="ticker-dot">●</span>TEMPERATURES STABLE</span>
+      <span class="ticker-item"><span class="ticker-dot">●</span>SFOTH IV BACK FROM THE DEAD</span>
+      <span class="ticker-item"><span class="ticker-dot">●</span>PHONES DEPLOYED</span>
+      <span class="ticker-item"><span class="ticker-dot">●</span>99.9% DETECTION RATE</span>
+    </div>
+    <div class="ticker-group">
+      <span class="ticker-item"><span class="ticker-dot">●</span>ANTI-REACH ACTIVE</span>
+      <span class="ticker-item"><span class="ticker-dot">●</span>LOOPKILL DETECTION RUNNING</span>
+      <span class="ticker-item"><span class="ticker-dot">●</span>DETECTION SUCCESSFUL</span>
+      <span class="ticker-item"><span class="ticker-dot">●</span>SFOTH IV ONLINE</span>
+      <span class="ticker-item"><span class="ticker-dot">●</span>PHONE BOT MONITORING</span>
+      <span class="ticker-item"><span class="ticker-dot">●</span>99.7% DETECTION RATE</span>
+      <span class="ticker-item"><span class="ticker-dot">●</span>ANTI-GRIEFER ACTIVE</span>
+      <span class="ticker-item"><span class="ticker-dot">●</span>EXPLOIT DETECTION RUNNING</span>
+      <span class="ticker-item"><span class="ticker-dot">●</span>TEMPERATURES STABLE</span>
+      <span class="ticker-item"><span class="ticker-dot">●</span>SFOTH IV BACK FROM THE DEAD</span>
+      <span class="ticker-item"><span class="ticker-dot">●</span>PHONES DEPLOYED</span>
+      <span class="ticker-item"><span class="ticker-dot">●</span>99.9% DETECTION RATE</span>
+    </div>
   </div>
 </div>
 
