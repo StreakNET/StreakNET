@@ -656,6 +656,166 @@
   .terminal .info { color: #5a8ab0; }
   .terminal .dim  { color: #383838; }
 
+  /* ── PRIVATE SERVERS ── */
+  .private-section {
+    max-width: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .private-wrap {
+    position: relative;
+    padding: 110px 44px;
+    overflow: hidden;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    isolation: isolate;
+  }
+
+  .private-bg {
+    position: absolute;
+    inset: -20px;
+    background-image: url('sfoth-private-bg.png');
+    background-size: cover;
+    background-position: center 30%;
+    filter: blur(9px) brightness(0.55) saturate(1.1);
+    transform: scale(1.08);
+    z-index: -2;
+  }
+
+  .private-overlay {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(180deg, rgba(8,8,8,0.55) 0%, rgba(8,8,8,0.82) 55%, rgba(8,8,8,0.95) 100%),
+      radial-gradient(ellipse 60% 80% at 50% 40%, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.65) 100%);
+    z-index: -1;
+  }
+
+  .private-content {
+    max-width: 720px;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .private-content .section-label {
+    justify-content: center;
+  }
+
+  .private-content .section-label::after {
+    display: none;
+  }
+
+  .private-content .section-title { margin-bottom: 16px; }
+
+  .private-body {
+    color: var(--light);
+    font-size: 0.92rem;
+    max-width: 480px;
+    margin: 0 auto 40px;
+  }
+
+  .private-servers-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(190px, 1fr));
+    gap: 16px;
+    max-width: 760px;
+    margin: 0 auto;
+  }
+
+  .private-server-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    padding: 26px 20px;
+    background: rgba(10,10,10,0.55);
+    border: 1px solid var(--muted);
+    backdrop-filter: blur(6px);
+    transition: border-color 0.2s, background 0.2s, transform 0.15s;
+  }
+
+  .private-server-card:hover {
+    border-color: var(--silver);
+    background: rgba(14,14,14,0.7);
+    transform: translateY(-3px);
+  }
+
+  .private-code {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .private-code-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.64rem;
+    letter-spacing: 0.2em;
+    color: var(--slash);
+    text-transform: uppercase;
+  }
+
+  .private-code-value {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.92rem;
+    letter-spacing: 0.08em;
+    color: var(--white);
+    margin-top: 4px;
+  }
+
+  .btn-join {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.8rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--black);
+    background: var(--white);
+    border: none;
+    padding: 13px 22px;
+    width: 100%;
+    cursor: pointer;
+    text-decoration: none;
+    clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+    transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    position: relative;
+  }
+
+  .btn-join::before {
+    content: '';
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: #4a9a4a;
+    box-shadow: 0 0 6px #4a9a4a;
+    animation: pulse 2s infinite;
+    flex-shrink: 0;
+  }
+
+  .btn-join.is-full::before { background: var(--danger); box-shadow: 0 0 6px var(--danger); }
+
+  .btn-join:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 28px rgba(255,255,255,0.18);
+  }
+
+  .private-note {
+    margin-top: 22px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    color: var(--slash);
+  }
+
+  @media (max-width: 720px) {
+    .private-wrap { padding: 72px 20px; }
+    .private-servers-grid { grid-template-columns: 1fr; }
+  }
+
   /* ── REPORT FORM ── */
   .report-form {
     margin-top: 52px;
@@ -960,6 +1120,7 @@
   <ul class="nav-links">
     <li><a href="#features">Features</a></li>
     <li><a href="#how">How It Works</a></li>
+    <li><a href="#private">Private Servers</a></li>
     <li><a href="#stats">Stats</a></li>
     <li><a href="#report">Report</a></li>
     <li><a href="#contact">Contact</a></li>
@@ -1121,6 +1282,55 @@
     <div><span class="dim">[2026-06-15 14:33:12]</span> <span class="warn">FLAG</span>   Player "Vessel111117" -- flagged for reach!</div>
     <div><span class="dim">[2026-06-15 14:33:12]</span> <span class="ok">ACT</span>    Auto-kick issued and data has been logged.</div>
     <div><span class="dim">[2026-06-15 14:33:45]</span> <span class="ok">OK</span>     Session clean. Continuing observation...<span class="terminal-cursor"></span></div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- PRIVATE SERVERS -->
+<section id="private" class="private-section">
+  <div class="private-wrap">
+    <div class="private-bg"></div>
+    <div class="private-overlay"></div>
+    <div class="private-content">
+      <div class="section-label reveal">// PRIVATE ACCESS</div>
+      <h2 class="section-title reveal">Play in a <em>Private Server</em></h2>
+      <p class="private-body reveal">
+        Skip the public chaos and jump into a clean, moderated instance of SFOTH IV. Same deal, zero exploiters allowed!
+      </p>
+
+      <div class="private-servers-grid reveal-grid">
+        <div class="private-server-card">
+          <div class="private-code">
+            <span class="private-code-label">Server 01</span>
+            <span class="private-code-value">Private/Comp Server 01</span>
+          </div>
+          <a href="https://www.roblox.com/share?code=7c8843e7351d2b41b755d55da217eab9&type=Server" class="btn-join" target="_blank" rel="noopener">
+            Join
+          </a>
+        </div>
+        <div class="private-server-card">
+          <div class="private-code">
+            <span class="private-code-label">Server 02</span>
+            <span class="private-code-value">Private/Comp Server 02</span>
+          </div>
+          <a href="https://www.roblox.com/share?code=52590fb6652eec4b8ac1ca68f4156dae&type=Server" class="btn-join" target="_blank" rel="noopener">
+            Join
+          </a>
+        </div>
+        <div class="private-server-card">
+          <div class="private-code">
+            <span class="private-code-label">Server 03</span>
+            <span class="private-code-value">Private/Comp Server 03g</span>
+          </div>
+          <a href="https://www.roblox.com/share?code=6e7aadb3a00d444681f0df3761161fc6&type=Server" class="btn-join" target="_blank" rel="noopener">
+            Join
+          </a>
+        </div>
+      </div>
+
+      <p class="private-note reveal">// Links are permanent and will be monitered daily.</p>
+    </div>
   </div>
 </section>
 
