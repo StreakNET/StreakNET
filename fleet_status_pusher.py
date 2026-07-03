@@ -74,9 +74,6 @@ WATCHED_PROCESSES = [
     "Immortalizer",
     "AdvancedBrightnessSlider",
     "NewTerm3",
-    "sshd",
-    "SpringBoard",
-    "backboardd",
 ]
 
 OUTPUT_FILENAME = "fleet-status.json"
