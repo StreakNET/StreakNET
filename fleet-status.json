@@ -1,0 +1,29 @@
+{
+  "generated_at": 1783041195.8600795,
+  "devices": [
+    {
+      "name": "iPhone 8 (Global)",
+      "online": false,
+      "error": "offline or unreachable",
+      "uptime": "\u2014",
+      "battery_pct": null,
+      "is_charging": false,
+      "temp_f": null,
+      "temp_c": null,
+      "watched_processes": [],
+      "process_count": null
+    },
+    {
+      "name": "iPhone 8 (GSM)",
+      "online": false,
+      "error": "offline or unreachable",
+      "uptime": "\u2014",
+      "battery_pct": null,
+      "is_charging": false,
+      "temp_f": null,
+      "temp_c": null,
+      "watched_processes": [],
+      "process_count": null
+    }
+  ]
+}
