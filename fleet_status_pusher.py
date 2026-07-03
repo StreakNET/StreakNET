@@ -48,6 +48,16 @@ Notes:
       battery/temp doesn't change fast enough to need it more often than that.
     - The script skips the commit entirely if nothing changed, so idle
       phones won't generate empty commits.
+    - Before each push, the script now pulls first and auto-resolves any
+      conflict in favor of the freshest local data (since this file is
+      regenerated completely every cycle, the newest copy is always the
+      right one to keep). This means the script no longer gets stuck if
+      GitHub's copy has drifted (e.g. from an edit made elsewhere).
+    - Keep this folder's OTHER files (index.html, this script, etc.)
+      committed and pushed the normal way when you edit them by hand. The
+      auto-resolve above only ever applies to fleet-status.json — if you
+      have unrelated uncommitted edits sitting in the folder, the pull can
+      still fail and will tell you to resolve it manually, same as before.
 """
 
 import re
@@ -237,7 +247,14 @@ def git(args, cwd):
 
 
 def push_if_changed(repo_dir, output_filename):
-    """Commits + pushes OUTPUT_FILENAME only if it actually changed."""
+    """Commits + pushes OUTPUT_FILENAME only if it actually changed.
+
+    Pulls first so a stale local branch doesn't get rejected by GitHub. If
+    that pull hits a merge conflict, it resolves in favor of the version
+    just written locally (-X ours) — since this script regenerates the
+    whole file fresh every cycle anyway, the newest local copy is always
+    the one worth keeping.
+    """
     status = git(["status", "--porcelain", output_filename], cwd=repo_dir)
     if not status.stdout.strip():
         return False, "no changes"
@@ -246,6 +263,10 @@ def push_if_changed(repo_dir, output_filename):
     commit = git(["commit", "-m", GIT_COMMIT_MESSAGE], cwd=repo_dir)
     if commit.returncode != 0:
         return False, f"commit failed: {commit.stderr.strip()[:200]}"
+
+    pull = git(["pull", "--no-rebase", "--no-edit", "-X", "ours"], cwd=repo_dir)
+    if pull.returncode != 0:
+        return False, f"pull failed (resolve manually): {pull.stderr.strip()[:200]}"
 
     push = git(["push"], cwd=repo_dir)
     if push.returncode != 0:
