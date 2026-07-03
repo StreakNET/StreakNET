@@ -656,6 +656,128 @@
   .terminal .info { color: #5a8ab0; }
   .terminal .dim  { color: #383838; }
 
+  /* ── FLEET STATUS (read-only phone stat cards) ── */
+  .fleet-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    margin-top: 52px;
+  }
+
+  .fleet-card {
+    background: var(--dark);
+    padding: 30px 30px 26px;
+    position: relative;
+  }
+
+  .fleet-card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 22px;
+  }
+
+  .fleet-name {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.95rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--white);
+  }
+
+  .fleet-pill {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.66rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #4a9a4a;
+  }
+
+  .fleet-pill.is-offline { color: var(--danger); }
+
+  .fleet-pill-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+    box-shadow: 0 0 6px currentColor;
+    animation: pulse 2s infinite;
+    flex-shrink: 0;
+  }
+
+  .fleet-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+
+  .fleet-row:last-of-type { margin-bottom: 0; }
+
+  .fleet-row-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.66rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--slash);
+  }
+
+  .fleet-row-value {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--light);
+  }
+
+  .fleet-row-value.big {
+    font-size: 1.7rem;
+    font-weight: 700;
+    color: var(--white);
+  }
+
+  .fleet-battery-track {
+    width: 100%;
+    height: 5px;
+    background: var(--muted);
+    margin: 6px 0 18px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .fleet-battery-fill {
+    height: 100%;
+    background: #4a9a4a;
+    width: 0%;
+    transition: width 0.4s ease;
+  }
+
+  .fleet-battery-fill.is-warn { background: #c89a1a; }
+  .fleet-battery-fill.is-low  { background: var(--danger); }
+
+  .fleet-note {
+    margin-top: 8px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.06em;
+    color: var(--slash);
+  }
+
+  .fleet-status-line {
+    margin-top: 52px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    color: var(--slash);
+    text-align: center;
+  }
+
+  .fleet-status-line.is-error { color: var(--danger); }
+
   /* ── PRIVATE SERVERS ── */
   .private-section {
     max-width: none;
@@ -1120,6 +1242,7 @@
   <ul class="nav-links">
     <li><a href="#features">Features</a></li>
     <li><a href="#how">How It Works</a></li>
+    <li><a href="#fleet">Fleet</a></li>
     <li><a href="#private">Private Servers</a></li>
     <li><a href="#stats">Stats</a></li>
     <li><a href="#report">Report</a></li>
@@ -1283,6 +1406,30 @@
     <div><span class="dim">[2026-06-15 14:33:12]</span> <span class="ok">ACT</span>    Auto-kick issued and data has been logged.</div>
     <div><span class="dim">[2026-06-15 14:33:45]</span> <span class="ok">OK</span>     Session clean. Continuing observation...<span class="terminal-cursor"></span></div>
   </div>
+</section>
+
+<hr class="divider">
+
+<!-- FLEET STATUS (read-only) -->
+<section id="fleet">
+  <div class="section-label reveal">// FLEET STATUS</div>
+  <h2 class="section-title reveal">Bot <em>Hardware Health</em></h2>
+  <p class="reveal" style="color:var(--silver); max-width:520px; font-size:0.88rem;">
+    Battery, thermal, and uptime for the devices running StreakNet's bots — mirrored here from the monitor script roughly once a minute.
+  </p>
+
+  <div class="fleet-grid reveal-grid" id="fleet-grid">
+    <!-- Cards are injected by JS below; this placeholder shows before the first fetch -->
+    <div class="fleet-card">
+      <div class="fleet-card-head">
+        <span class="fleet-name">Loading fleet…</span>
+        <span class="fleet-pill"><span class="fleet-pill-dot"></span>—</span>
+      </div>
+      <div class="fleet-row"><span class="fleet-row-label">Status</span></div>
+    </div>
+  </div>
+
+  <div class="fleet-status-line" id="fleet-status-line">// connecting to fleet status feed…</div>
 </section>
 
 <hr class="divider">
@@ -1501,6 +1648,109 @@
       }
     });
   }
+
+  // ── FLEET STATUS (read-only) ──────────────────────────────────────────
+  // fleet_status_pusher.py writes this file and pushes it to the repo; it's
+  // just a plain static file served by GitHub Pages next to index.html.
+  // No server, no API, nothing listening for requests — this page only
+  // ever does a same-origin GET on a JSON file.
+  const FLEET_DATA_URL = "fleet-status.json";
+  const FLEET_POLL_MS = 60000;
+
+  const fleetGrid = document.getElementById('fleet-grid');
+  const fleetStatusLine = document.getElementById('fleet-status-line');
+
+  function fleetBatteryClass(pct) {
+    if (pct === null || pct === undefined) return '';
+    if (pct < 15) return 'is-low';
+    if (pct < 40) return 'is-warn';
+    return '';
+  }
+
+  function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str == null ? '' : String(str);
+    return div.innerHTML;
+  }
+
+  function renderFleet(devices) {
+    if (!devices || devices.length === 0) {
+      fleetGrid.innerHTML = '<div class="fleet-card"><div class="fleet-card-head"><span class="fleet-name">No devices configured</span></div></div>';
+      return;
+    }
+
+    fleetGrid.innerHTML = devices.map(d => {
+      const online = !!d.online;
+      const pillClass = online ? '' : 'is-offline';
+      const pillText = online ? 'ONLINE' : 'OFFLINE';
+      const battClass = fleetBatteryClass(d.battery_pct);
+      const battWidth = (typeof d.battery_pct === 'number') ? Math.max(0, Math.min(100, d.battery_pct)) : 0;
+      const battLabel = (typeof d.battery_pct === 'number') ? d.battery_pct + '%' : '—';
+      const chargingTag = d.is_charging ? ' ⚡' : '';
+      const tempBig = (d.temp_f !== null && d.temp_f !== undefined) ? d.temp_f.toFixed(1) + '°F' : '—';
+      const tempSmall = (d.temp_c !== null && d.temp_c !== undefined) ? '(' + d.temp_c.toFixed(1) + '°C)' : '';
+      const uptime = d.uptime || '—';
+      const procCount = (d.process_count !== null && d.process_count !== undefined) ? d.process_count : '—';
+      const watched = (d.watched_processes && d.watched_processes.length)
+        ? d.watched_processes.map(escapeHtml).join(', ')
+        : 'none flagged';
+      const errNote = d.error ? '<div class="fleet-note">// ' + escapeHtml(d.error) + '</div>' : '';
+
+      return `
+        <div class="fleet-card">
+          <div class="fleet-card-head">
+            <span class="fleet-name">${escapeHtml(d.name)}</span>
+            <span class="fleet-pill ${pillClass}"><span class="fleet-pill-dot"></span>${pillText}${chargingTag}</span>
+          </div>
+
+          <div class="fleet-row">
+            <span class="fleet-row-label">Temp</span>
+            <span class="fleet-row-value big">${tempBig} <span style="font-size:0.9rem; color:var(--silver); font-weight:500;">${tempSmall}</span></span>
+          </div>
+
+          <div class="fleet-row">
+            <span class="fleet-row-label">Battery</span>
+            <span class="fleet-row-value">${battLabel}</span>
+          </div>
+          <div class="fleet-battery-track">
+            <div class="fleet-battery-fill ${battClass}" style="width:${battWidth}%;"></div>
+          </div>
+
+          <div class="fleet-row">
+            <span class="fleet-row-label">Uptime</span>
+            <span class="fleet-row-value">${escapeHtml(uptime)}</span>
+          </div>
+          <div class="fleet-row">
+            <span class="fleet-row-label">Processes</span>
+            <span class="fleet-row-value">${escapeHtml(procCount)}</span>
+          </div>
+
+          <div class="fleet-note">// watching: ${watched}</div>
+          ${errNote}
+        </div>
+      `;
+    }).join('');
+  }
+
+  async function pollFleetStatus() {
+    try {
+      // cache-bust so browsers/CDNs don't serve a stale copy of the file
+      const res = await fetch(FLEET_DATA_URL + '?t=' + Date.now(), { cache: 'no-store' });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const data = await res.json();
+
+      renderFleet(data.devices);
+      const stamp = data.generated_at ? new Date(data.generated_at * 1000).toLocaleTimeString() : '—';
+      fleetStatusLine.textContent = '// last updated ' + stamp;
+      fleetStatusLine.classList.remove('is-error');
+    } catch (err) {
+      fleetStatusLine.textContent = '// fleet-status.json not found yet — waiting on first push';
+      fleetStatusLine.classList.add('is-error');
+    }
+  }
+
+  pollFleetStatus();
+  setInterval(pollFleetStatus, FLEET_POLL_MS);
 </script>
 
 </body>
