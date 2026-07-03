@@ -1,0 +1,3 @@
+# Machine-specific and sensitive — never commit this
+config_local.py
+__pycache__/ 

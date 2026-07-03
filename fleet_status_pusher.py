@@ -32,12 +32,14 @@ Requirements:
     credential — however you normally push to this repo from this machine).
 
 Setup:
-    1. Fill in DEVICES below (same values as monitor.py).
-    2. Set KEY_PATH (recommended) or a per-device password, same as monitor.py.
-    3. Set REPO_DIR to the local path of your cloned StreakNet GitHub Pages
-       repo (the folder that contains index.html).
-    4. Run: python fleet_status_pusher.py
-    5. Leave it running (e.g. in a terminal, or as a background/startup task).
+    1. Copy config_local.example.py to config_local.py (same folder as this
+       file) and fill in your DEVICES, KEY_PATH, and REPO_DIR there.
+    2. config_local.py is listed in .gitignore on purpose — it holds your
+       SSH password/path and your local folder path, and should never be
+       committed. This file (fleet_status_pusher.py) is safe to commit,
+       since it no longer contains any of that.
+    3. Run: python fleet_status_pusher.py
+    4. Leave it running (e.g. in a terminal, or as a background/startup task).
 
 Notes:
     - Every push triggers a small GitHub Pages rebuild (usually live again
@@ -52,32 +54,21 @@ import re
 import json
 import time
 import subprocess
-from pathlib import Path
+
+try:
+    from config_local import DEVICES, KEY_PATH, REPO_DIR
+except ImportError:
+    raise SystemExit(
+        "Missing config_local.py.\n"
+        "Copy config_local.example.py to config_local.py in this same folder "
+        "and fill in your DEVICES, KEY_PATH, and REPO_DIR."
+    )
 
 import paramiko
 
 # ----------------------------------------------------------------------------
-# CONFIG — edit this section for your phones and repo
+# CONFIG — shared, non-sensitive settings. Safe to commit as-is.
 # ----------------------------------------------------------------------------
-
-KEY_PATH = None  # e.g. r"C:\Users\you\.ssh\iphone_rig" — set this once key auth works
-
-DEVICES = [
-    {
-        "name": "iPhone 8 (Global)",
-        "host": "192.168.0.108",
-        "user": "mobile",
-        "password": "your-custom-password",
-        "port": 22,
-    },
-    {
-        "name": "iPhone 8 (GSM)",
-        "host": "192.168.0.218",
-        "user": "mobile",
-        "password": "your-custom-password",
-        "port": 22,
-    },
-]
 
 WATCHED_PROCESSES = [
     "Immortalizer",
@@ -87,9 +78,6 @@ WATCHED_PROCESSES = [
     "SpringBoard",
     "backboardd",
 ]
-
-# Local path to your cloned GitHub Pages repo (the folder with index.html in it).
-REPO_DIR = Path(r"C:\Users\Anthony Barnett\StreakNET")
 
 OUTPUT_FILENAME = "fleet-status.json"
 POLL_INTERVAL_SECONDS = 60
