@@ -1,15 +1,15 @@
 {
-  "generated_at": 1783059126.8667967,
+  "generated_at": 1783059191.7103841,
   "devices": [
     {
       "name": "iPhone 8 (Global)",
       "online": true,
       "error": "",
-      "uptime": "9:27",
+      "uptime": "9:28",
       "battery_pct": 100,
       "is_charging": false,
-      "temp_f": 91.0,
-      "temp_c": 32.8,
+      "temp_f": 91.4,
+      "temp_c": 33.0,
       "watched_processes": [
         "SpringBoard",
         "backboardd",
@@ -21,17 +21,17 @@
       "name": "iPhone 8 (GSM)",
       "online": true,
       "error": "",
-      "uptime": "5 days  7:03",
+      "uptime": "5 days  7:04",
       "battery_pct": 100,
       "is_charging": false,
       "temp_f": 82.6,
       "temp_c": 28.1,
       "watched_processes": [
+        "sshd",
         "backboardd",
-        "SpringBoard",
-        "sshd"
+        "SpringBoard"
       ],
-      "process_count": 361
+      "process_count": 360
     }
   ]
 }
