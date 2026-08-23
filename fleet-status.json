@@ -1,11 +1,11 @@
 {
-  "generated_at": 1787451477.9204836,
+  "generated_at": 1787451540.8459077,
   "devices": [
     {
       "name": "iPhone 8 (Global)",
       "online": true,
       "error": "",
-      "uptime": "19:16",
+      "uptime": "19:17",
       "battery_pct": 100,
       "is_charging": false,
       "temp_f": 80.8,
@@ -21,7 +21,7 @@
       "name": "iPhone 8 (GSM)",
       "online": true,
       "error": "",
-      "uptime": "2 days  5:50",
+      "uptime": "2 days  5:51",
       "battery_pct": 100,
       "is_charging": false,
       "temp_f": 78.6,
